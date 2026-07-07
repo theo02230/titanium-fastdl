@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titanium BaseWars — Chargement</title>
+<style>
+  :root{
+    --cyan:#3FAFFF;
+    --bg:#0a0e14;
+    --panel:#111823;
+    --line:#213247;
+    --text:#eaf2fb;
+    --muted:#78899b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    background:var(--bg);color:var(--text);
+    overflow:hidden;
+  }
+  /* Bandeau supérieur flat */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;height:3px;background:var(--cyan);
+  }
+  .stage{
+    height:100%;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;
+    padding:40px;
+  }
+  .logo{
+    font-size:64px;font-weight:800;letter-spacing:4px;text-transform:uppercase;
+    line-height:1;
+  }
+  .logo b{color:var(--cyan)}
+  .tag{
+    margin-top:12px;color:var(--muted);
+    font-size:14px;letter-spacing:6px;text-transform:uppercase;
+  }
+  .server{margin-top:40px;font-size:22px;font-weight:600}
+  .meta{margin-top:8px;color:var(--muted);font-size:15px}
+  .meta b{color:var(--cyan);font-weight:600}
+  /* Astuce rotative */
+  .tip{
+    margin-top:34px;
+    min-height:22px;
+    color:var(--text);font-size:15px;
+    opacity:0;transition:opacity .4s;
+  }
+  .tip.show{opacity:1}
+  .tip .lbl{color:var(--cyan);font-weight:700;margin-right:8px}
+  /* Barre bas d'écran */
+  .footer{
+    position:fixed;bottom:0;left:0;right:0;
+    padding:22px 44px;
+    background:var(--panel);
+    border-top:1px solid var(--line);
+  }
+  .bar{height:8px;background:var(--bg);border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .bar-fill{height:100%;width:0%;background:var(--cyan);transition:width .25s linear}
+  .status{margin-top:10px;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+  .file{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%}
+</style>
+</head>
+<body>
+  <div class="topbar"></div>
+
+  <div class="stage">
+    <div class="logo">TITAN<b>IUM</b></div>
+    <div class="tag">BaseWars</div>
+
+    <div class="server" id="servername">Titanium BaseWars</div>
+    <div class="meta">Carte <b id="mapname">—</b> · <b id="players">0/0</b> joueurs</div>
+
+    <div class="tip" id="tip"></div>
+  </div>
+
+  <div class="footer">
+    <div class="bar"><div class="bar-fill" id="fill"></div></div>
+    <div class="status">
+      <div class="file" id="file">Connexion au serveur…</div>
+      <div id="pct">0%</div>
+    </div>
+  </div>
+
+<script>
+  var total=0, needed=0;
+
+  function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode){
+    if(servername) document.getElementById('servername').textContent = servername;
+    if(mapname)    document.getElementById('mapname').textContent   = mapname;
+    document.getElementById('players').textContent = '0/' + (maxplayers||0);
+  }
+  function SetFilesTotal(t){ total=t; }
+  function SetFilesNeeded(n){ needed=n; render(); }
+  function DownloadingFile(name){
+    if(name) name = name.replace('?','');
+    document.getElementById('file').textContent = 'Téléchargement : ' + name;
+  }
+  function render(){
+    var done=total-needed;
+    var pct = total>0 ? Math.floor((done/total)*100) : 0;
+    if(pct<0)pct=0; if(pct>100)pct=100;
+    document.getElementById('fill').style.width = pct+'%';
+    document.getElementById('pct').textContent  = pct+'%';
+  }
+
+  // --- Astuces qui défilent ---
+  var tips = [
+    ['F4','Achète des imprimantes et développe ton business.'],
+    ['C','Passe de saison, Caisses, Clans et Règles en un clic.'],
+    ['!quetes','Quêtes journalières = $ et Ti Coins.'],
+    ['!vote','Vote pour le serveur et gagne des récompenses.'],
+    ['!raid','Attaque les bases ennemies pour piller leurs imprimantes.']
+  ];
+  var i = 0, el = document.getElementById('tip');
+  function cycle(){
+    el.classList.remove('show');
+    setTimeout(function(){
+      var t = tips[i % tips.length];
+      el.innerHTML = '<span class="lbl">'+t[0]+'</span>'+t[1];
+      el.classList.add('show');
+      i++;
+    }, 400);
+  }
+  cycle();
+  setInterval(cycle, 4000);
+</script>
+</body>
+</html>
